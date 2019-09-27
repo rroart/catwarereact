@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 
 import { Client, ConvertToSelect } from '../util'
 import Select from 'react-select';
-import { DropdownButton, MenuItem, ButtonToolbar, Nav, Navbar, NavItem, FormControl } from 'react-bootstrap';
+import { DropdownButton, MenuItem, ButtonToolbar, Nav, Navbar, NavItem, FormControl, Form, FormGroup, ControlLabel } from 'react-bootstrap';
 
 class VippsBar extends PureComponent {
     type : string;
@@ -17,6 +17,9 @@ class VippsBar extends PureComponent {
 	console.log(event);
 	console.log(event.value);
     }
+
+    getValidationState() {
+    }
     
     render() {
 	let comp;
@@ -30,6 +33,9 @@ class VippsBar extends PureComponent {
 		  </Navbar.Header>
 		  <Nav>
 		    <h2>Organisasjon</h2>
+		      <Form>
+			<FormGroup controlId="form" validationState = { this.getValidationState()}>
+			  <ControlLabel>Working example with validation</ControlLabel>
 		    <NavItem eventKey={3} href="#">
 		      Organisasjonsnummer
 		      <FormControl
@@ -60,6 +66,12 @@ class VippsBar extends PureComponent {
 			onKeyDown={this.addMessage}
 			/>
 		    </NavItem>
+		    <NavItem eventKey={5} href="#">
+		      Bed
+		      <FormControl.Feedback/>
+		    </NavItem>
+		    </FormGroup>
+		    </Form>
 		  </Nav>
 		</Navbar>
 	    )
