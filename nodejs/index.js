@@ -1,3 +1,4 @@
+const dnb = require('./dnb/index');
 // Import packages
 const express = require('express')
 const morgan = require('morgan')
@@ -34,6 +35,18 @@ app.get('/misc/payex/firmanavn/suggest/:firma', (req, res) => {
 })
 app.get('/misc/payex/firmanavn/search/:firma', (req, res) => {
     res.json({ orgnr : 918399038, firmanavn : "Catware AS", navn : "Catware AS", faktureringsadresse : { adresse : "Åkebergveien 12", postnummer : 0650, poststed : "Oslo" }, besoksadresse : { adresse : "Åkebergveien 12", postnummer : 0650, poststed : "Oslo" } })
+})
+
+app.get('/dnb/currencies/:cur', (req, res) => {
+    console.log(req.params.cur);
+
+    (async() => {
+	const currencies = await dnb.getCurrencyConversions('NOK').catch((err) => console.log('caught it'));
+	res.json(currencies)
+    })()
+
+    res.json("end")
+
 })
 // Starting server
 app.listen('1337')
