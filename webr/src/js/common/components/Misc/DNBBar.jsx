@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 
 import { Client, ConvertToSelect } from '../util'
 import Select from 'react-select';
-import { Button, DropdownButton, MenuItem, ButtonToolbar, Nav, Navbar, NavItem, FormControl, Form, FormGroup } from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem, ButtonToolbar, Nav, Navbar, NavItem, FormControl, Form, FormGroup, ControlLabel } from 'react-bootstrap';
 
 class DNBBar extends PureComponent {
     type : string;
@@ -14,6 +14,7 @@ class DNBBar extends PureComponent {
 	myaccount : undefined,
 	otheraccount : undefined,
 	money : undefined,
+	result: undefined,
     }
     constructor(props) {
 	super(props);
@@ -29,8 +30,8 @@ class DNBBar extends PureComponent {
 
     handleAccountChange(event) {
 	console.log(event);
-	console.log(event.target.value);
-	this.state.myaccount = event.target.value;
+	console.log(event.value);
+	this.state.myaccount = event.value;
 	console.log(this.state);
     }
 
@@ -45,8 +46,13 @@ class DNBBar extends PureComponent {
     }
 
     submitMoney(event) {
-       this.state.money = event.target.value;
         console.log(this.state)
+	Client.search("/dnb/accounts/pay/" + this.state.personnummer + "/" + this.state.otheraccount + "/" + "Othername" + "/" + this.state.myaccount + "/" + this.state.money, (result) => {
+	    this.setState({
+		result: result
+	    });
+	});
+	console.log("here");
     }
 
     handleSubmit(event) {
@@ -163,6 +169,7 @@ class DNBBar extends PureComponent {
 		</Navbar>
 		)
 	    } else {
+		var accts = ConvertToSelect.convert(this.state.accounts);
 		console.log("here");
 	    comp = (
 		<Navbar>
@@ -178,7 +185,7 @@ class DNBBar extends PureComponent {
 			  <ControlLabel>Working example without validation</ControlLabel>
 			  <NavItem eventKey={1} href="#">
 			    Konto
-			    <Select onChange={this.handleAccountChange} options={this.state.accounts} />
+			    <Select onChange={this.handleAccountChange} options={ accts } />
 			  </NavItem>
 		    <NavItem eventKey={5} href="#">
 		      Til konto
@@ -207,7 +214,7 @@ class DNBBar extends PureComponent {
 			placeholder="Enter text"
 			onClick={this.submitMoney}
 			>
-		      See accounts
+		      Send penger
                      </Button>
 		    </NavItem>
 		  </Nav>
@@ -216,6 +223,11 @@ class DNBBar extends PureComponent {
 		  </Nav>
 		</Navbar>
 	    )
+		if (this.state.result != undefined) {
+		    comp = comp + (
+			<h2>{result}</h2>
+		    )
+		}
 	    }
 	}
 	return (
