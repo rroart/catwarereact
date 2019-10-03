@@ -1,5 +1,6 @@
 const dnb = require('./dnb/index');
 const consent = require('./dnbsandbox/consent');
+const account = require('./dnbsandbox/account');
 // Import packages
 const express = require('express')
 const morgan = require('morgan')
@@ -7,6 +8,8 @@ const morgan = require('morgan')
 const app = express()
 // Morgan
 app.use(morgan('tiny'))
+//app.use(express.json());
+//app.use(express.urlencoded({extended: true}));
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -50,11 +53,38 @@ app.get('/dnb/currencies/:cur', (req, res) => {
 
 })
 
-app.get('/dnb/consents', (req, res) => {
+app.get('/dnb/consents/:personnummer', (req, res) => {
     (async() => {
-	const result = await consent().catch((err) => console.log('caught it'));
+	console.log("body");
+	const result = await consent.post(req.params.personnummer).catch((err) => console.log('caught it'));
 	console.log(result);
-	res.json("end");
+	res.json({ consentId : result.consentId, href : result._links.scaRedirect.href });
+    })()
+    //res.json("end2")
+})
+
+app.get('/dnb/consents/:personnummer/:contentid', (req, res) => {
+    (async() => {
+	const result = await consent.post(req.params.personnummer, req.params.consentid).catch((err) => console.log('caught it'));
+	console.log(result);
+	res.json({ consentId : result.consentId });
+    })()
+    //res.json("end2")
+})
+
+app.get('/dnb/accounts/:consentid', (req, res) => {
+    account(req.params.consentid);
+    (async() => {
+	const result = await account(req.params.consentid).catch((err) => console.log('caught it'));
+	console.log(result);
+	console.log(result.accounts.length);
+	console.log(typeof result.accounts[0]);
+	var l = []
+	var i;
+	for (i = 0; i < result.accounts.length; i++) {
+	    l.push(result.accounts[i].bban); 
+	}
+	res.json({ accounts : l });
     })()
     //res.json("end2")
 })

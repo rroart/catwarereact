@@ -2,6 +2,8 @@ const fs = require('fs')
 
 const asv4 = require('../dnb/asv4')
 
+const uuidv4 = require('uuid/v4')
+
 function createAmzDate() {
     return new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
 }
@@ -13,6 +15,8 @@ exports.createRequest = function createRequest({
     method = 'POST',
     data,
     queryString = '',
+    ssn,
+    consentid,
 }) {
     const options = {
 	host: psd2endpoint,
@@ -22,11 +26,10 @@ exports.createRequest = function createRequest({
 	    Host: psd2endpoint,
 	    Accept: 'application/json',
 	    'Content-type': 'application/json',
-	    "X-Request-ID": "22FD6960-46A4-49FB-BD0B-E78A018C8DC0",
+	    "X-Request-ID": uuidv4(),
 	    'x-amz-date': createAmzDate(),
 	    "TPP-Redirect-Preferred": "true",
-	    "TPP-Redirect-URI": "http://tpp-service.net",
-	    "PSU-ID": 31125464346,
+	    "TPP-Redirect-URI": "http://0.0.0.0:3083",
 	    "PSU-IP-Address": "212.251.233.248",
 	    "PSU-User-Agent": "Chrome",
 	},
@@ -35,6 +38,12 @@ exports.createRequest = function createRequest({
     };
     if (queryString !== '') {
 	options.path += `?${queryString}`;
+    }
+    if (ssn != undefined && ssn !== '') {
+	options.headers["PSU-ID"] = ssn;
+    }
+    if (consentid != undefined && consentid !== '') {
+	options.headers['Consent-ID'] = consentid;
     }
     if (data) {
 	options.data = JSON.stringify(data);

@@ -4,17 +4,27 @@ const request = require('../dnb/request')
 
 const psd2endpoint = 'sandboxapi.psd.dnb.no'
 
-module.exports = function consent() {
+exports.post = function post(personnummer) {
     const req = common.createRequest({
 	    host: psd2endpoint, 
 	    path: '/v1/consents',
 	    method: 'POST',
-	    data: data1,
+	data: data1,
+	ssn: personnummer,
     });
-    var date = new Date();
-    date.setMonth(date.getMonth() + 2);
-    validUntil = date.toISOString().split('T')[0];
-    console.log(validUntil);
+    console.log(req);
+    return request(req);
+}
+
+exports.get = function get(personnummer, consentid) {
+    const req = common.createRequest({
+	    host: psd2endpoint, 
+	    path: '/v1/consents',
+	    method: 'POST',
+	data: data1,
+	ssn: personnummer,
+	consentid: consentid,
+    });
     console.log(req);
     return request(req);
 }
