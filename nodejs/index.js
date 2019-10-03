@@ -1,4 +1,5 @@
 const dnb = require('./dnb/index');
+const consent = require('./dnbsandbox/consent');
 // Import packages
 const express = require('express')
 const morgan = require('morgan')
@@ -48,5 +49,15 @@ app.get('/dnb/currencies/:cur', (req, res) => {
     res.json("end")
 
 })
+
+app.get('/dnb/consents', (req, res) => {
+    (async() => {
+	const result = await consent().catch((err) => console.log('caught it'));
+	console.log(result);
+	res.json("end");
+    })()
+    //res.json("end2")
+})
+
 // Starting server
 app.listen('1337')
