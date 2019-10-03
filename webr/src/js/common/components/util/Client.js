@@ -8,6 +8,17 @@ function search(query, cb) {
     .catch((error) => console.log(error.message));
 }
 
+function post(query, data, cb) {
+  return fetch(`http://localhost:1337` + query, {
+    accept: 'application/json',
+    method: 'POST',
+    body: JSON.stringify(data),
+  }).then(checkStatus)
+    .then(parseJSON)
+    .then(cb)
+    .catch((error) => console.log(error.message));
+}
+
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -24,5 +35,5 @@ function parseJSON(response) {
   return response.json();
 }
 
-const Client = { search };
+const Client = { search, post };
 export default Client;

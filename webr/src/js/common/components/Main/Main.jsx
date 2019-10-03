@@ -5,6 +5,7 @@ import { Button } from 'react-bootstrap';
 import './Main.css';
 import { Tabs, Tab } from 'react-bootstrap';
 
+import { DNB } from '../Misc'
 import { Misc } from '../Misc'
 import { Vipps } from '../Misc'
 import { Test } from '../test'
@@ -41,7 +42,10 @@ class Main extends React.Component {
 	    return (
 		<Fragment>
 		  <h1>Catware React</h1>
-		  <Tabs defaultActiveKey={1} id="maintabs">
+		  <Tabs defaultActiveKey={0} id="maintabs">
+		    <Tab eventKey={0} title="DNB">
+		      <DNB/>
+		    </Tab>
 		    <Tab eventKey={1} title="Payex">
 		      <Misc/>
 		    </Tab>
