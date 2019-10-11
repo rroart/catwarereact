@@ -7,6 +7,7 @@ import { Button, DropdownButton, MenuItem, ButtonToolbar, Nav, Navbar, NavItem, 
 class DNBBar extends PureComponent {
     type : string;
     state = {
+	page: 1,
 	personnummer: undefined,
 	consentid: '',
 	logon: undefined,
@@ -15,6 +16,7 @@ class DNBBar extends PureComponent {
 	otheraccount : undefined,
 	money : undefined,
 	result: undefined,
+	paymentid: undefined,
     }
     constructor(props) {
 	super(props);
@@ -36,23 +38,25 @@ class DNBBar extends PureComponent {
     }
 
     handleOtherChange(event) {
-       this.state.otheraccount = event.target.value;
+	this.state.otheraccount = event.target.value;
         console.log(this.state)
     }
 
     handleMoneyChange(event) {
-       this.state.money = event.target.value;
+	this.state.money = event.target.value;
         console.log(this.state)
     }
 
     submitMoney(event) {
         console.log(this.state)
 	Client.search("/dnb/accounts/pay/" + this.state.personnummer + "/" + this.state.otheraccount + "/" + "Othername" + "/" + this.state.myaccount + "/" + this.state.money, (result) => {
-	    this.setState({
-		result: result
-	    });
+            this.setState({
+                paymentid: result.paymentId,
+                logon: result.href
+            });
 	});
 	console.log("here");
+	this.state.page = 4
     }
 
     handleSubmit(event) {
@@ -68,19 +72,20 @@ class DNBBar extends PureComponent {
 		logon: result.href
 	    });
 	});
+	this.state.page = 2
 	/*
-	Client.search("/dnb/consents/ +  personnummer + "/" + this.state.consentid }, (consentid) => {
-	    this.setState({
-		consentid: consentid.consentId
-	    });
-	});
+	  Client.search("/dnb/consents/ +  personnummer + "/" + this.state.consentid }, (consentid) => {
+	  this.setState({
+	  consentid: consentid.consentId
+	  });
+	  });
 	*/
 	/*
-	Client.search("/dnb/consents/" + event.target.value, (consentid) => {
-	    this.setState({
-		consentid: consentid.consentId
-	    });
-	});
+	  Client.search("/dnb/consents/" + event.target.value, (consentid) => {
+	  this.setState({
+	  consentid: consentid.consentId
+	  });
+	  });
         */
 	console.log("here")
 	console.log(this.state)
@@ -101,11 +106,13 @@ class DNBBar extends PureComponent {
 	});
 	console.log("here")
         console.log(this.state)
+	this.state.page = 3
 
     }
 
     render() {
 	console.log("xxx")
+	console.log(this.state.page)
 	console.log(this.state.value == undefined)
 	console.log(this.state)
 	console.log(this.state.personnummer == undefined)
@@ -113,7 +120,7 @@ class DNBBar extends PureComponent {
 	    console.log(this.state.personnummer)
 	}
 	let comp;
-	if (this.state.personnummer == undefined) {
+	if (this.state.page == 1) {
 	    comp = (
 		<Navbar>
 		  <Navbar.Header>
@@ -135,42 +142,17 @@ class DNBBar extends PureComponent {
 		</Navbar>
 	    )
 	}
-	if (this.state.personnummer != undefined) {
-	    if (this.state.logon != undefined) {
-		var win = window.open(this.state.logon, '_blank');
-		win.focus();
-		const sleep = (milliseconds) => {
-		    return new Promise(resolve => setTimeout(resolve, milliseconds))
-		}
-		sleep(15000).then(() => {
-		    //do stuff
-		})
-		console.log("undef");
-		this.state.logon = undefined;
-		comp = (
-		<Navbar>
-		  <Navbar.Header>
-		    <Navbar.Brand>
-		      <a href="#home">{this.type}</a>
-		    </Navbar.Brand>
-		  </Navbar.Header>
-		  <Nav>
-		    <NavItem eventKey={3} href="#">
-		      Personnummer
-		      <Button
-			value={this.state.value}
-			placeholder="Enter text"
-			onClick={this.buttonClick}
-			>
-		      See accounts
-                     </Button>
-		    </NavItem>
-		  </Nav>
-		</Navbar>
-		)
-	    } else {
-		var accts = ConvertToSelect.convert(this.state.accounts);
-		console.log("here");
+	if (this.state.page == 2) {
+	    var win = window.open(this.state.logon, '_blank');
+	    win.focus();
+	    const sleep = (milliseconds) => {
+		return new Promise(resolve => setTimeout(resolve, milliseconds))
+	    }
+	    sleep(15000).then(() => {
+		//do stuff
+	    })
+	    console.log("undef");
+	    this.state.logon = undefined;
 	    comp = (
 		<Navbar>
 		  <Navbar.Header>
@@ -178,57 +160,100 @@ class DNBBar extends PureComponent {
 		      <a href="#home">{this.type}</a>
 		    </Navbar.Brand>
 		  </Navbar.Header>
-		  <h2>Generell firmainformasjon</h2>
-		  <Nav>
-		      <Form>
-			<FormGroup controlId="form" >
-			  <ControlLabel>Working example without validation</ControlLabel>
-			  <NavItem eventKey={1} href="#">
-			    Konto
-			    <Select onChange={this.handleAccountChange} options={ accts } />
-			  </NavItem>
-		    <NavItem eventKey={5} href="#">
-		      Til konto
-		      <FormControl
-			type="text"
-			value={this.state.otheraccount}
-			placeholder="Enter text"
-			onChange={this.handleOtherChange}
-			/>
-		    </NavItem>
-		    <NavItem eventKey={6} href="#">
-		      Beløp
-		      <FormControl
-			type="text"
-			value={this.state.money}
-			placeholder="Enter text"
-			onChange={this.handleMoneyChange}
-			/>
-		    </NavItem>
 		  <Nav>
 		    <NavItem eventKey={3} href="#">
-		      Send penger
 		      <Button
-			type="text"
 			value={this.state.value}
 			placeholder="Enter text"
-			onClick={this.submitMoney}
+			onClick={this.buttonClick}
 			>
-		      Send penger
-                     </Button>
+			See accounts
+                      </Button>
 		    </NavItem>
 		  </Nav>
-		    </FormGroup>
+		</Navbar>
+	    )
+	}
+	if (this.state.page == 3) {
+	    var accts = ConvertToSelect.convert(this.state.accounts);
+	    console.log("here");
+	    comp = (
+		<Navbar>
+		  <Navbar.Header>
+		    <Navbar.Brand>
+		      <a href="#home">{this.type}</a>
+		    </Navbar.Brand>
+		  </Navbar.Header>
+		  <Nav>
+		    <Form>
+		      <FormGroup controlId="form" >
+			<ControlLabel>Working example without validation</ControlLabel>
+			<NavItem eventKey={1} href="#">
+			  Konto
+			  <Select onChange={this.handleAccountChange} options={ accts } />
+			</NavItem>
+			<NavItem eventKey={5} href="#">
+			  Til konto
+			  <FormControl
+			    type="text"
+			    value={this.state.otheraccount}
+			    placeholder="Enter text"
+			    onChange={this.handleOtherChange}
+			    />
+			</NavItem>
+			<NavItem eventKey={6} href="#">
+			  Beløp
+			  <FormControl
+			    type="text"
+			    value={this.state.money}
+			    placeholder="Enter text"
+			    onChange={this.handleMoneyChange}
+			    />
+			</NavItem>
+			<Nav>
+			  <NavItem eventKey={3} href="#">
+			    Send penger
+			    <Button
+			      type="text"
+			      value={this.state.value}
+			      placeholder="Enter text"
+			      onClick={this.submitMoney}
+			      >
+			      Send penger
+			    </Button>
+			  </NavItem>
+			</Nav>
+		      </FormGroup>
 		    </Form>
 		  </Nav>
 		</Navbar>
 	    )
-		if (this.state.result != undefined) {
-		    comp = comp + (
-			<h2>{result}</h2>
-		    )
-		}
+	}
+	if (this.state.page == 4) {
+	    var win = window.open(this.state.logon, '_blank');
+	    win.focus();
+	    const sleep = (milliseconds) => {
+		return new Promise(resolve => setTimeout(resolve, milliseconds))
 	    }
+	    sleep(15000).then(() => {
+		//do stuff
+	    })
+	    console.log("undef");
+	    this.state.logon = undefined;
+	    comp = (
+		<Navbar>
+		  <Navbar.Header>
+		    <Navbar.Brand>
+		      <a href="#home">{this.type}</a>
+		    </Navbar.Brand>
+		  </Navbar.Header>
+		  <Nav>
+		    <NavItem eventKey={3} href="#">
+		      <h2>Betaling registrert med id {this.state.paymentid}</h2>
+		    </NavItem>
+		  </Nav>
+		</Navbar>
+	    )
 	}
 	return (
 	    <div>
