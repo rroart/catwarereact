@@ -27,8 +27,6 @@ exports.createRequest = function createRequest({
 	    Accept: 'application/json',
 	    'Content-type': 'application/json',
 	    "X-Request-ID": uuidv4(),
-	    'x-amz-date': createAmzDate(),
-	    "TPP-Redirect-Preferred": "true",
 	    "TPP-Redirect-URI": "http://0.0.0.0:3083",
 	    "PSU-IP-Address": "212.251.233.248",
 	    "PSU-User-Agent": "Chrome",
@@ -47,7 +45,7 @@ exports.createRequest = function createRequest({
     }
     if (data) {
 	options.data = JSON.stringify(data);
-	options.headers['x-amz-content-sha256'] = asv4.hash(options.data, 'hex');
+	//options.headers['x-amz-content-sha256'] = asv4.hash(options.data, 'hex');
     }
     if (path.includes('token')) {
 	options.headers.Authorization = asv4.sign(options, clientId, clientSecret);

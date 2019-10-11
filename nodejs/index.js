@@ -1,6 +1,7 @@
 const dnb = require('./dnb/index');
 const consent = require('./dnbsandbox/consent');
 const account = require('./dnbsandbox/account');
+const pay = require('./dnbsandbox/pay');
 // Import packages
 const express = require('express')
 const morgan = require('morgan')
@@ -85,6 +86,17 @@ app.get('/dnb/accounts/:consentid', (req, res) => {
 	    l.push(result.accounts[i].bban); 
 	}
 	res.json({ accounts : l });
+    })()
+    //res.json("end2")
+})
+
+app.get('/dnb/accounts/pay/:ssn/:creditor/:creditorname/:debtor/:amount', (req, res) => {
+    //account(req.params.consentid);
+    (async() => {
+	const result = await pay(req.params.ssn, req.params.creditor, req.params.creditorname, req.params.debtor, req.params.amount).catch((err) => console.log('caught it'));
+	console.log(result);
+	res.json({ paymentId : result.paymentId, href : result._links.scaRedirect.href });
+	//res.json({ result : result });
     })()
     //res.json("end2")
 })
