@@ -9,8 +9,8 @@ const morgan = require('morgan')
 const app = express()
 // Morgan
 app.use(morgan('tiny'))
-//app.use(express.json());
-//app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -54,10 +54,10 @@ app.get('/dnb/currencies/:cur', (req, res) => {
 
 })
 
-app.get('/dnb/consents/:personnummer', (req, res) => {
+app.post('/dnb/consents', (req, res) => {
     (async() => {
 	console.log("body");
-	const result = await consent.post(req.params.personnummer).catch((err) => console.log('caught it'));
+	const result = await consent.post(req.body.personnummer).catch((err) => console.log('caught it'));
 	console.log(result);
 	res.json({ consentId : result.consentId, href : result._links.scaRedirect.href });
     })()
@@ -94,6 +94,25 @@ app.get('/dnb/accounts/pay/:ssn/:creditor/:creditorname/:debtor/:amount', (req, 
     //account(req.params.consentid);
     (async() => {
 	const result = await pay(req.params.ssn, req.params.creditor, req.params.creditorname, req.params.debtor, req.params.amount).catch((err) => console.log('caught it'));
+	console.log(result);
+	res.json({ paymentId : result.paymentId, href : result._links.scaRedirect.href });
+	//res.json({ result : result });
+    })()
+    //res.json("end2")
+})
+
+app.post('/dnb/accounts/pay', (req, res) => {
+    //account(req.params.consentid);
+    (async() => {
+	console.log("headers")
+	console.log(JSON.stringify(req.headers));
+	console.log("postbody")
+	console.log(req.body)
+	console.log(req.body.personnummer)
+	console.log(req.body.creditor)
+	console.log(req.body.debtor)
+	console.log(req.body.amount)
+	const result = await pay(req.body.personnummer, req.body.creditor, req.body.creditorname, req.body.debtor, req.body.amount).catch((err) => console.log('caught it'));
 	console.log(result);
 	res.json({ paymentId : result.paymentId, href : result._links.scaRedirect.href });
 	//res.json({ result : result });

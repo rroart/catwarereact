@@ -53,7 +53,7 @@ class DNBBar extends PureComponent {
 
     submitMoney(event) {
         console.log(this.state)
-	Client.search("/dnb/accounts/pay/" + this.state.personnummer + "/" + this.state.otheraccount + "/" + "Othername" + "/" + this.state.myaccount + "/" + this.state.money, (result) => {
+	Client.post("/dnb/accounts/pay", { personnummer : this.state.personnummer, creditor : this.state.otheraccount, creditorname : "Othername", debtor : this.state.myaccount , amount : this.state.money }, (result) => {
             this.setState({
                 paymentid: result.paymentId,
                 logon: result.href
@@ -67,10 +67,7 @@ class DNBBar extends PureComponent {
 	console.log(event);
 	console.log(event.target.value);
 	this.state.personnummer = event.target.value;
-	Client.search("/dnb/consents/" + event.target.value, (result) => {
-	    console.log(result)
-	});
-	Client.search("/dnb/consents/" + event.target.value, (result) => {
+	Client.post("/dnb/consents", { personnummer : event.target.value }, (result) => {
 	    this.setState({
 		consentid: result.consentId,
 		logon: result.href

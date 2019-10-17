@@ -9,8 +9,12 @@ function search(query, cb) {
 }
 
 function post(query, data, cb) {
+    console.log(JSON.stringify(data))
   return fetch(`http://localhost:1337` + query, {
     accept: 'application/json',
+    headers: {
+	  'content-type': 'application/json',
+    },
     method: 'POST',
     body: JSON.stringify(data),
   }).then(checkStatus)
