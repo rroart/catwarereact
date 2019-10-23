@@ -3,10 +3,12 @@ const https = require('https');
 module.exports = function request(params) {
   return new Promise((resolve, reject) => {
     const request_ = https.request(params, (response) => {
+/*
       if (response.statusCode < 200 || response.statusCode >= 300) {
         request_.end();
         return reject(new Error(`statusCode=${response.statusCode}`));
       }
+*/
       // cumulate data
       let body = [];
       response.on('data', (chunk) => {
@@ -19,7 +21,7 @@ module.exports = function request(params) {
         } catch (error) {
           reject(error);
         }
-        resolve(body);
+          resolve({ code : response.statusCode, body : body });
       });
       return response;
     });

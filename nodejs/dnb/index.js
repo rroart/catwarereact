@@ -9,7 +9,7 @@ const request = require('./request');
 dotenv.config({ path: join(__dirname, '..', '.env') });
 dotenv.config({ path: join(__dirname, '..', '..', '.env') });
 
-const { clientId, clientSecret, apiKey } = loadCredentials();
+//const { clientId, clientSecret, apiKey } = loadCredentials();
 
 // AWS signing v4 constants
 const awsRegion = 'eu-west-1';

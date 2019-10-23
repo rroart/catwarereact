@@ -4,7 +4,7 @@ const request = require('../dnb/request')
 
 const psd2endpoint = 'sandboxapi.psd.dnb.no'
 
-module.exports = function pay(ssn, creditor, creditorname, debtor, amount) {
+module.exports = function pay(psuid, creditor, creditorname, debtor, amount) {
     const data1 = {
 	"creditorAccount" : { "bban" : creditor },
 	"creditorName" : creditorname,
@@ -15,7 +15,7 @@ module.exports = function pay(ssn, creditor, creditorname, debtor, amount) {
 	    host: psd2endpoint, 
 	    path: '/v1/payments/norwegian-domestic-credit-transfers',
 	    method: 'POST',
-	ssn: ssn,
+	psuid: psuid,
 	data: data1,
     });
     console.log(req);

@@ -4,3 +4,5 @@ curl http://localhost:1337/dnb/consents/31125464346/7bfcdb9a-e707-40c1-b6e6-e8ee
 
 curl http://localhost:1337/dnb/accounts/c6f90242-d116-4008-8b6d-5091da9a190f
 
+curl --header 'content-type: application/json' -d '{ "personnummer" : "31125464346" }' http://localhost:1337/consents
+

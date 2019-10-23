@@ -23,6 +23,13 @@ function post(query, data, cb) {
     .catch((error) => console.log(error.message));
 }
 
+function checkStatusNot(response) {
+  if (response.status < 200 || response.status >= 300) {
+      console.log(response)
+  }
+  return response;
+}
+
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;

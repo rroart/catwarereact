@@ -4,25 +4,25 @@ const request = require('../dnb/request')
 
 const psd2endpoint = 'sandboxapi.psd.dnb.no'
 
-exports.post = function post(personnummer) {
+exports.post = function post(psuid) {
     const req = common.createRequest({
 	    host: psd2endpoint, 
 	    path: '/v1/consents',
 	    method: 'POST',
 	data: data1,
-	ssn: personnummer,
+	psuid: psuid,
     });
     console.log(req);
     return request(req);
 }
 
-exports.get = function get(personnummer, consentid) {
+exports.get = function get(psuid, consentid) {
     const req = common.createRequest({
 	    host: psd2endpoint, 
 	    path: '/v1/consents',
 	    method: 'POST',
 	data: data1,
-	ssn: personnummer,
+	psuid: psuid,
 	consentid: consentid,
     });
     console.log(req);

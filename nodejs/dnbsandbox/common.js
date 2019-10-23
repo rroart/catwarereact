@@ -15,7 +15,7 @@ exports.createRequest = function createRequest({
     method = 'POST',
     data,
     queryString = '',
-    ssn,
+    psuid,
     consentid,
 }) {
     const options = {
@@ -37,8 +37,8 @@ exports.createRequest = function createRequest({
     if (queryString !== '') {
 	options.path += `?${queryString}`;
     }
-    if (ssn != undefined && ssn !== '') {
-	options.headers["PSU-ID"] = ssn;
+    if (psuid != undefined && psuid !== '') {
+	options.headers["PSU-ID"] = psuid;
     }
     if (consentid != undefined && consentid !== '') {
 	options.headers['Consent-ID'] = consentid;

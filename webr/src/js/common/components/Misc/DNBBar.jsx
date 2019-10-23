@@ -4,14 +4,15 @@ import { Client, ConvertToSelect } from '../util'
 import Select from 'react-select';
 import { Button, DropdownButton, MenuItem, ButtonToolbar, Nav, Navbar, NavItem, FormControl, Form, FormGroup, ControlLabel } from 'react-bootstrap';
 
+const bank = "DNB";
+
 class DNBBar extends PureComponent {
     type : string;
     state = {
 	page: 1,
 	subpage: 1,
 	subsubpage: 1,
-	personnummer: undefined,
-	consentid: '',
+	psuid: undefined,
 	logon: undefined,
 	accounts : undefined,
 	myaccount : undefined,
@@ -53,7 +54,7 @@ class DNBBar extends PureComponent {
 
     submitMoney(event) {
         console.log(this.state)
-	Client.post("/dnb/accounts/pay", { personnummer : this.state.personnummer, creditor : this.state.otheraccount, creditorname : "Othername", debtor : this.state.myaccount , amount : this.state.money }, (result) => {
+	Client.post("/accounts/pay", { psuid : this.state.psuid, creditor : this.state.otheraccount, creditorname : "Othername", debtor : this.state.myaccount , amount : this.state.money }, (result) => {
             this.setState({
                 paymentid: result.paymentId,
                 logon: result.href
@@ -66,29 +67,19 @@ class DNBBar extends PureComponent {
     handleSubmit(event) {
 	console.log(event);
 	console.log(event.target.value);
-	this.state.personnummer = event.target.value;
-	Client.post("/dnb/consents", { personnummer : event.target.value }, (result) => {
+	this.state.psuid = event.target.value;
+	Client.post("/consents", { bank : bank, psuid : event.target.value }, (result) => {
+	    console.log("here");
+	    console.log(result);
+	    console.log(result.body);
+	    console.log(typeof result.body);
 	    this.setState({
-		consentid: result.consentId,
 		logon: result.href
 	    });
 	});
 	this.state.page = 2
 	this.state.subpage = 0
-	/*
-	  Client.search("/dnb/consents/ +  personnummer + "/" + this.state.consentid }, (consentid) => {
-	  this.setState({
-	  consentid: consentid.consentId
-	  });
-	  });
-	*/
-	/*
-	  Client.search("/dnb/consents/" + event.target.value, (consentid) => {
-	  this.setState({
-	  consentid: consentid.consentId
-	  });
-	  });
-        */
+	this.state.subsubpage = 0
 	console.log("here")
 	console.log(this.state)
     }
@@ -101,7 +92,7 @@ class DNBBar extends PureComponent {
 
     buttonClick(event) {
 	this.state.logon = undefined;
-	Client.search("/dnb/accounts/"+ this.state.consentid, (result) => {
+	Client.search("/accounts/" + bank + "/"+ this.state.psuid, (result) => {
 	    this.setState({
 		accounts : result.accounts
 	    });
@@ -145,9 +136,9 @@ class DNBBar extends PureComponent {
 	console.log(this.state.subsubpage)
 	console.log(this.state.value == undefined)
 	console.log(this.state)
-	console.log(this.state.personnummer == undefined)
-	if (this.state.personnummer != undefined) {
-	    console.log(this.state.personnummer)
+	console.log(this.state.psuid == undefined)
+	if (this.state.psuid != undefined) {
+	    console.log(this.state.psuid)
 	}
 	let menu;
 	menu = (
@@ -180,7 +171,7 @@ class DNBBar extends PureComponent {
 		  </Navbar.Header>
 		  <Nav>
 		    <NavItem eventKey={3} href="#">
-		      Personnummer
+		      Logg inn
 		      <FormControl
 			type="text"
 			value={this.state.value}
@@ -192,20 +183,23 @@ class DNBBar extends PureComponent {
 		</Navbar>
 	    )
 	}
+	if (this.state.page == 2) {
+	    //window.location.href = this.state.logon;
+	    var win = window.open(this.state.logon, '_blank');
+	    win.focus();
+	    const sleep = (milliseconds) => {
+		return new Promise(resolve => setTimeout(resolve, milliseconds))
+	    }
+	    sleep(15000).then(() => {
+		//do stuff
+	    })
+	    console.log("undef");
+	    this.state.logon = undefined;
+	    this.state.page = 3;
+	}
 	if (this.state.page == 3) {
 	    if (this.state.subpage == 1) {
 		if (this.state.subsubpage == 1) {
-		    //window.location.href = this.state.logon;
-		    var win = window.open(this.state.logon, '_blank');
-		    win.focus();
-		    const sleep = (milliseconds) => {
-			return new Promise(resolve => setTimeout(resolve, milliseconds))
-		    }
-		    sleep(15000).then(() => {
-			//do stuff
-		    })
-		    console.log("undef");
-		    this.state.logon = undefined;
 		    comp = (
 			<Navbar>
 			  <Navbar.Header>
@@ -265,9 +259,7 @@ class DNBBar extends PureComponent {
 				</NavItem>
 				<Nav>
 				  <NavItem eventKey={3} href="#">
-				    Send penger
 				    <Button
-				      type="text"
 				      value={this.state.value}
 				      placeholder="Enter text"
 				      onClick={this.submitMoney}
