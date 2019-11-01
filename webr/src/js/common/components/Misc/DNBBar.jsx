@@ -20,6 +20,7 @@ class DNBBar extends PureComponent {
 	money : undefined,
 	result: undefined,
 	paymentid: undefined,
+	error: undefined,
     }
     constructor(props) {
 	super(props);
@@ -64,22 +65,55 @@ class DNBBar extends PureComponent {
 	this.state.subsubpage = 3
     }
 
+    async handleloginresult(mythis, result, statuscode) {
+	console.log(result);
+	const result2 = await result.json();
+	console.log(result2);
+	    if (statuscode >= 200 && statuscode < 300) {
+		//console.log(result.body);
+		//console.log(typeof result.body);
+		mythis.setState({
+		    logon: result2.href,
+		    page : 2,
+		    subpage : 0,
+		    subsubpage : 0,
+		});
+	    } else {
+		mythis.setState({
+		    error : result2,
+		    page : 99,
+		});
+	    }
+    }
+    
     handleSubmit(event) {
 	console.log(event);
 	console.log(event.target.value);
 	this.state.psuid = event.target.value;
-	Client.post("/consents", { bank : bank, psuid : event.target.value }, (result) => {
+	Client.post("/consents", { bank : bank, psuid : event.target.value }, resultarray => {
 	    console.log("here");
+	    console.log(resultarray);
+	    var statuscode = resultarray[0];
+	    var result = resultarray[1];
+	    console.log(statuscode);
+	    console.log(typeof statuscode);
 	    console.log(result);
-	    console.log(result.body);
-	    console.log(typeof result.body);
-	    this.setState({
-		logon: result.href
-	    });
+	    console.log(typeof result);
+	    //const bla2 = result.json().;
+	    //console.log(bla2);
+	    //var nn = result.then(e => e, e => e);
+	    //console.log(typeof nn);
+	    //console.log(nn);
+	    //console.log(nn.tppMessages);
+	    //console.log(result.then(this.f.bind(this)).catch());
+	    //var bla = result.then(this.f.bind(this)).catch();
+	    //console.log(bla);
+	    //result = this.state.fetchresult;
+	    //console.log(this.state);
+	    //console.log(result);
+	    const vv = result.then(this.handleloginresult(this, result, statuscode)).catch((error) => console.log(error.message));
+	    console.log(vv);
 	});
-	this.state.page = 2
-	this.state.subpage = 0
-	this.state.subsubpage = 0
 	console.log("here")
 	console.log(this.state)
     }
@@ -144,7 +178,7 @@ class DNBBar extends PureComponent {
 	menu = (
 	    <h2>Login</h2>
 	)
-	if (this.state.page != 1) {
+	if (this.state.page != 1 && this.state.page != 99) {
 	    menu = (
 		<div>
 		<DropdownButton id="1" title="Konto" onSelect={this.dropdownkonto}>
@@ -301,6 +335,30 @@ class DNBBar extends PureComponent {
 		    )
 		}
 	    }
+	}
+	if (this.state.page == 99) {
+	    console.log(this.state);
+	    console.log(this.state.error);
+	    var msgs = this.state.error.tppMessages;
+	    let lines = []
+	    var i;
+	    for (i = 0; i < msgs.length; i++) {
+		lines.push(<h3>{msgs[i].text}</h3>);
+	    }
+	    comp = (
+		<Navbar>
+		  <Navbar.Header>
+		    <Navbar.Brand>
+		      <a href="#home">ERROR</a>
+		    </Navbar.Brand>
+		  </Navbar.Header>
+		  <Nav>
+		    <NavItem eventKey={3} href="#">
+		      { lines }
+		    </NavItem>
+		  </Nav>
+		</Navbar>
+	    )
 	}
 	return (
 	    <div>

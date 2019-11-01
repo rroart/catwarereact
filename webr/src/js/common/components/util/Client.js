@@ -1,6 +1,12 @@
 /* eslint-disable no-undef */
+
+function getPort() {
+    //return 1337;
+    return 8080;
+}
+
 function search(query, cb) {
-  return fetch(`http://localhost:1337` + query, {
+  return fetch(`http://localhost:` + getPort() + query, {
     accept: 'application/json',
   }).then(checkStatus)
     .then(parseJSON)
@@ -10,7 +16,7 @@ function search(query, cb) {
 
 function post(query, data, cb) {
     console.log(JSON.stringify(data))
-  return fetch(`http://localhost:1337` + query, {
+  return fetch(`http://localhost:` + getPort() + query, {
     accept: 'application/json',
     headers: {
 	  'content-type': 'application/json',
@@ -23,14 +29,22 @@ function post(query, data, cb) {
     .catch((error) => console.log(error.message));
 }
 
-function checkStatusNot(response) {
+function f(p) {
+    console.log(p);
+    console.log(Object.keys(p));
+    console.log(typeof p);
+    return p;
+}
+
+function checkStatus(response) {
+    console.log(Object.keys( response));
   if (response.status < 200 || response.status >= 300) {
       console.log(response)
   }
   return response;
 }
 
-function checkStatus(response) {
+function checkStatusNot(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
   } else {
@@ -42,8 +56,22 @@ function checkStatus(response) {
   }
 }
 
+async function mywait(response) {
+    const result = await response.json();
+    return result;
+}
+
 function parseJSON(response) {
-  return response.json();
+    console.log(response.status);
+    //return Promise.resolve(response);
+	//.json();
+    //resolve(response);
+    //return response.json();
+    //const some = response.json();
+    //console.log(some);
+    //console.log(Object.keys(some));
+    //console.log(some.PromiseValue);
+    return [ response.status, response ];
 }
 
 const Client = { search, post };
