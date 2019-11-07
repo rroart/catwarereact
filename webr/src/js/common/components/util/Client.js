@@ -8,6 +8,9 @@ function getPort() {
 function search(query, cb) {
   return fetch(`http://localhost:` + getPort() + query, {
     accept: 'application/json',
+    headers: {
+	  'content-type': 'application/json',
+    },
   }).then(checkStatus)
     .then(parseJSON)
     .then(cb)
@@ -63,6 +66,7 @@ async function mywait(response) {
 
 function parseJSON(response) {
     console.log(response.status);
+    console.log(response);
     //return Promise.resolve(response);
 	//.json();
     //resolve(response);
