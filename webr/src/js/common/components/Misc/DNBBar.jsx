@@ -167,21 +167,56 @@ class DNBBar extends PureComponent {
   }
 
   submitMoney(event) {
-    console.log(this.state)
-    Client.post("/accounts/pay", {
-      psuid: this.state.psuid,
-      creditor: this.state.otheraccount,
-      creditorname: "Othername",
-      debtor: this.state.myaccount,
-      amount: this.state.money
-    }, (result) => {
-      this.setState({
-        paymentid: result.paymentId,
-        logon: result.href
-      });
+      console.log(this.state)
+      var amount = new Object();
+      amount['amount'] = this.state.money;
+      amount['currency'] = 'NOK';
+      var payment = new Object();
+      payment['psuid'] = this.state.psuid;
+      payment['bank'] = bank;
+      payment['creditorAccount'] = { "bban" : this.state.otheraccount };
+      payment['creditorName'] = 'My Name';
+      payment['debtorAccount'] = { "bban" : this.state.myaccount };
+      payment['instructedAmount'] = { "amount" : this.state.money, "currency": "NOK" };
+      Client.post("/accounts/pay", payment, (resultarray) => {
+      console.log(resultarray);
+      var statuscode = resultarray[0];
+      var result = resultarray[1];
+      console.log(statuscode);
+      console.log(typeof statuscode);
+      console.log(result);
+      console.log(typeof result);
+      const vv = result.then(this.handlepayresult(this, result, statuscode)).catch((error) => console.log(error.message));
+      console.log(vv);
     });
-    console.log("here");
-    this.state.subsubpage = 3
+    console.log("here")
+    console.log(this.state)
+  }
+
+  async handlepayresult(mythis, result, statuscode) {
+    console.log(result);
+    var result2 = await result.json();
+    if (result2.body !== undefined) {
+      console.log("RESULT HAS BODY");
+      result2 = result2.body;
+    }
+    console.log(statuscode);
+    console.log(result2);
+    if (statuscode >= 200 && statuscode < 300) {
+      //console.log(result.body);
+	//console.log(typeof result.body);
+	var result3 = JSON.parse(result2);
+      mythis.setState({
+        paymentid: result3.paymentId,
+        logon: result3._links.scaRedirect.href,
+        subsubpage: 2,
+    });
+    } else {
+      mythis.setState({
+        error: result2,
+        page: 99,
+      });
+    }
   }
 
   async handleloginresult(mythis, result, statuscode) {
@@ -297,6 +332,7 @@ class DNBBar extends PureComponent {
     }
   }
 
+  // deprecated
   buttonClick(event) {
     this.state.logon = undefined;
     Client.search("/accounts/" + bank + "/" + this.state.psuid, (result) => {
@@ -437,6 +473,7 @@ class DNBBar extends PureComponent {
         win.focus();
       }
       console.log(new Date().getSeconds())
+      // calling bad code
       this.sleep(15000);
       console.log(new Date().getSeconds())
       console.log("undef");
@@ -490,7 +527,7 @@ class DNBBar extends PureComponent {
     }
     if (this.state.page == 5) {
       if (this.state.subpage == 1) {
-        if (this.state.subsubpage == 1) {
+        if (this.state.subsubpage == 9999) {
           comp = (
             <Navbar>
               <Navbar.Header>
@@ -512,8 +549,8 @@ class DNBBar extends PureComponent {
             </Navbar>
           )
         }
-        if (this.state.subsubpage == 2) {
-          var accts = ConvertToSelect.convert(this.state.accounts);
+        if (this.state.subsubpage == 1) {
+          var accts = ConvertToSelect.convertAccounts(this.state.accounts);
           console.log("here");
           comp = (
             <Navbar>
@@ -565,15 +602,13 @@ class DNBBar extends PureComponent {
             </Navbar>
           )
         }
-        if (this.state.subsubpage == 3) {
+        if (this.state.subsubpage == 2) {
           var win = window.open(this.state.logon, '_blank');
           win.focus();
-          const sleep = (milliseconds) => {
-            return new Promise(resolve => setTimeout(resolve, milliseconds))
-          }
-          sleep(15000).then(() => {
-            //do stuff
-          })
+          console.log(new Date().getSeconds())
+          // calling bad code
+          this.sleep(15000);
+          console.log(new Date().getSeconds())
           console.log("undef");
           this.state.logon = undefined;
           comp = (
