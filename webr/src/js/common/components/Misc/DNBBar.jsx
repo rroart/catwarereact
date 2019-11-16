@@ -18,6 +18,10 @@ import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import {MyTable} from '../Table'
 
+import DatePicker from "react-datepicker";
+ 
+import "react-datepicker/dist/react-datepicker.css";
+
 const bank = "DNB";
 
 class DNBBar extends PureComponent {
@@ -36,7 +40,8 @@ class DNBBar extends PureComponent {
     money: undefined,
     result: undefined,
     paymentid: undefined,
-    error: undefined,
+      error: undefined,
+            data: [],
   }
 
   constructor(props) {
@@ -50,7 +55,13 @@ class DNBBar extends PureComponent {
     this.handleAccountChange = this.handleAccountChange.bind(this);
     this.handleOtherChange = this.handleOtherChange.bind(this);
     this.handleMoneyChange = this.handleMoneyChange.bind(this);
-    this.submitMoney = this.submitMoney.bind(this);
+      this.submitMoney = this.submitMoney.bind(this);
+      this.submitMoreMoney = this.submitMoreMoney.bind(this);
+      this.addNewQnaToTable = this.addNewQnaToTable.bind(this);
+      this.renderEditable = this.renderEditable.bind(this);
+      this.renderEditableSelect = this.renderEditableSelect.bind(this);
+      this.renderEditableDate = this.renderEditableDate.bind(this);
+      //this.state.data.push({firstName: 'f', lastName: 'l'});
   }
 
   // very bad code
@@ -171,13 +182,15 @@ class DNBBar extends PureComponent {
       var amount = new Object();
       amount['amount'] = this.state.money;
       amount['currency'] = 'NOK';
+      var aData = this.state.data[0];
       var payment = new Object();
       payment['psuid'] = this.state.psuid;
       payment['bank'] = bank;
-      payment['creditorAccount'] = { "bban" : this.state.otheraccount };
+      payment['creditorAccount'] = { "bban" : aData.creditor };
       payment['creditorName'] = 'My Name';
-      payment['debtorAccount'] = { "bban" : this.state.myaccount };
-      payment['instructedAmount'] = { "amount" : this.state.money, "currency": "NOK" };
+      payment['debtorAccount'] = { "bban" : aData.account };
+	  payment['instructedAmount'] = { "amount" : aData.amount, "currency": "NOK" };
+	  payment['requestedExecutionDate'] = aData.date;
       Client.post("/accounts/pay", payment, (resultarray) => {
       console.log(resultarray);
       var statuscode = resultarray[0];
@@ -210,11 +223,39 @@ class DNBBar extends PureComponent {
         paymentid: result3.paymentId,
         logon: result3._links.scaRedirect.href,
         subsubpage: 2,
+	  data: [],
     });
     } else {
       mythis.setState({
         error: result2,
         page: 99,
+      });
+    }
+  }
+
+  async handlepaymentsresult(mythis, result, statuscode) {
+    console.log(result);
+    var result2 = await result.json();
+    if (result2.body !== undefined) {
+      console.log("RESULT HAS BODY");
+      result2 = result2.body;
+    }
+    console.log(statuscode);
+    console.log(result2);
+    if (statuscode >= 200 && statuscode < 300) {
+      //console.log(result.body);
+	//console.log(typeof result.body);
+	var result3 = JSON.parse(result2);
+      mythis.setState({
+        //paymentid: result3.paymentId,
+        logon: result3._links.scaRedirect.href,
+        subsubpage: 2,
+	  data: [],
+    });
+    } else {
+      mythis.setState({
+        error: result2,
+          page: 99,
       });
     }
   }
@@ -403,10 +444,89 @@ class DNBBar extends PureComponent {
     this.setState({
       page: 5,
       subpage: event.target.id,
-      subsubpage: 1
+	subsubpage: 1,
+	data: [],
     });
   }
 
+  submitMoreMoney(event) {
+      console.log(this.state)
+      var amount = new Object();
+      amount['amount'] = this.state.money;
+      amount['currency'] = 'NOK';
+      var payments = [];
+      var i;
+      for (i = 0; i < this.state.data.length; i++) {
+	  var aData = this.state.data[i];
+      var payment = new Object();
+      payment['psuid'] = this.state.psuid;
+      payment['bank'] = bank;
+      payment['creditorAccount'] = { "bban" : aData.creditor };
+      payment['creditorName'] = 'My Name';
+      payment['debtorAccount'] = { "bban" : aData.account };
+	  payment['instructedAmount'] = { "amount" : aData.amount, "currency": "NOK" };
+	  payment['requestedExecutionDate'] = aData.date;
+	  payments.push(payment);
+      }
+      var mypayments = new Object();
+      mypayments['payments'] = payments;
+      console.log(mypayments);
+      Client.post("/accounts/payments", mypayments, (resultarray) => {
+      console.log(resultarray);
+      var statuscode = resultarray[0];
+      var result = resultarray[1];
+      console.log(statuscode);
+      console.log(typeof statuscode);
+      console.log(result);
+      console.log(typeof result);
+      const vv = result.then(this.handlepaymentsresult(this, result, statuscode)).catch((error) => console.log(error.message));
+      console.log(vv);
+    });
+    console.log("here")
+    console.log(this.state)
+  }
+
+    getColumns() {
+		    const columns = [];
+	    columns.push({
+                Header: "Kontonr",
+                accessor: "account",
+                Cell: this.renderEditableSelect
+            });
+	    columns.push({
+                Header: "Dato",
+                accessor: "date",
+                Cell: this.renderEditableDate
+            });
+	    columns.push({
+                Header: "Beløp",
+                accessor: "amount",
+                Cell: this.renderEditable
+            });
+	    columns.push({
+                Header: "Melding",
+                accessor: "message",
+                Cell: this.renderEditable
+            });
+	    columns.push({
+                Header: "Mottaker",
+                accessor: "creditor",
+                Cell: this.renderEditable
+            });
+	    columns.push({
+                Header: "Full Name",
+                id: "full",
+                accessor: d => (
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: d.amount + " " + d.message
+                    }}
+                  />
+                )
+            });
+	return columns;
+    }
+    
   render() {
     console.log("xxx")
     console.log(this.state.page)
@@ -415,6 +535,7 @@ class DNBBar extends PureComponent {
     console.log(this.state.value == undefined)
     console.log(this.state)
     console.log(this.state.psuid == undefined)
+      console.log(this.state.data)
     if (this.state.psuid != undefined) {
       console.log(this.state.psuid)
     }
@@ -434,9 +555,10 @@ class DNBBar extends PureComponent {
           </DropdownButton>
           <DropdownButton id="2" title="Betale og overføre" onSelect={this.dropdownbetale}>
             <MenuItem id="1" name="betaleen">Betale til en</MenuItem>
-            <MenuItem id="2" name="egne">Overføre egne kontoer</MenuItem>
-            <MenuItem id="3" name="betalingsoversikt">Betalingsoversikt</MenuItem>
-            <MenuItem id="4" name="betalinger">Utførte betalinger</MenuItem>
+            <MenuItem id="2" name="betaleen">Betale til flere</MenuItem>
+            <MenuItem id="3" name="egne">Overføre egne kontoer</MenuItem>
+            <MenuItem id="4" name="betalingsoversikt">Betalingsoversikt</MenuItem>
+            <MenuItem id="5" name="betalinger">Utførte betalinger</MenuItem>
           </DropdownButton>
         </div>
       )
@@ -551,7 +673,18 @@ class DNBBar extends PureComponent {
         }
         if (this.state.subsubpage == 1) {
           var accts = ConvertToSelect.convertAccounts(this.state.accounts);
-          console.log("here");
+            console.log("here");
+	    if (this.state.data.length == 0) {
+		this.state.data.push({
+	  account: "",
+	  date: "",
+	  creditor: "",
+	  amount: "",
+	  message: "",
+		});
+	    }
+	    const data = this.state.data;
+	    const columns = this.getColumns();
           comp = (
             <Navbar>
               <Navbar.Header>
@@ -560,31 +693,13 @@ class DNBBar extends PureComponent {
                 </Navbar.Brand>
               </Navbar.Header>
               <Nav>
-                <Form>
-                  <FormGroup controlId="form">
-                    <ControlLabel>Working example without validation</ControlLabel>
-                    <NavItem eventKey={1} href="#">
-                      Konto
-                      <Select onChange={this.handleAccountChange} options={accts}/>
-                    </NavItem>
-                    <NavItem eventKey={5} href="#">
-                      Til konto
-                      <FormControl
-                        type="text"
-                        value={this.state.otheraccount}
-                        placeholder="Enter text"
-                        onChange={this.handleOtherChange}
-                      />
-                    </NavItem>
-                    <NavItem eventKey={6} href="#">
-                      Beløp
-                      <FormControl
-                        type="text"
-                        value={this.state.money}
-                        placeholder="Enter text"
-                        onChange={this.handleMoneyChange}
-                      />
-                    </NavItem>
+		<ReactTable
+		  //key={date}
+		  data={data}
+		  columns={columns}
+		  defaultPageSize={10}
+		  className="-striped -highlight"
+		  />
                     <Nav>
                       <NavItem eventKey={3} href="#">
                         <Button
@@ -596,8 +711,6 @@ class DNBBar extends PureComponent {
                         </Button>
                       </NavItem>
                     </Nav>
-                  </FormGroup>
-                </Form>
               </Nav>
             </Navbar>
           )
@@ -621,6 +734,77 @@ class DNBBar extends PureComponent {
               <Nav>
                 <NavItem eventKey={3} href="#">
                   <h2>Betaling registrert med id {this.state.paymentid}</h2>
+                </NavItem>
+              </Nav>
+            </Navbar>
+          )
+        }
+      }
+      if (this.state.subpage == 2) {
+        if (this.state.subsubpage == 1) {
+            var accts = [];//ConvertToSelect.convertAccounts(this.state.accounts);
+            console.log("here");
+	    const data = this.state.data;
+	    console.log(data);
+	    const columns = this.getColumns();
+	    
+          comp = (
+            <Navbar>
+              <Navbar.Header>
+                <Navbar.Brand>
+                  <a href="#home">{this.type}</a>
+                </Navbar.Brand>
+              </Navbar.Header>
+              <Nav>
+		<Button
+		  text='Add QnA'
+		  primary={ true }
+		  onClick={this.addNewQnaToTable}
+		 >Add</Button>
+
+		<ReactTable
+		  //key={date}
+		  data={data}
+		  columns={columns}
+		  defaultPageSize={10}
+		  className="-striped -highlight"
+		  />
+                    <Nav>
+                      <NavItem eventKey={3} href="#">
+                        <Button
+                          value={this.state.value}
+                          placeholder="Enter text"
+                          onClick={this.submitMoreMoney}
+                        >
+                          Send penger
+                        </Button>
+                      </NavItem>
+                    </Nav>
+              </Nav>
+            </Navbar>
+          )
+        }
+        if (this.state.subsubpage == 2) {
+            var win = window.open(this.state.logon, '_blank');
+	    if (win != null) {
+		win.focus();
+	    }
+          console.log(new Date().getSeconds())
+          // calling bad code
+          this.sleep(15000);
+          console.log(new Date().getSeconds())
+          console.log("undef");
+          this.state.logon = undefined;
+          comp = (
+            <Navbar>
+              <Navbar.Header>
+                <Navbar.Brand>
+                  <a href="#home">{this.type}</a>
+                </Navbar.Brand>
+              </Navbar.Header>
+              <Nav>
+                <NavItem eventKey={3} href="#">
+                  <h2>Betalinger registrert</h2>
                 </NavItem>
               </Nav>
             </Navbar>
@@ -660,7 +844,89 @@ class DNBBar extends PureComponent {
       </div>
     );
   }
-}
 
+  renderEditable = cellInfo => {
+    const cellValue = this.state.data[cellInfo.index][cellInfo.column.id];
+
+    return (
+      <input
+        placeholder="type here"
+        name="input"
+        type="text"
+        onChange={this.handleInputChange.bind(null, cellInfo)}
+        value={cellValue}
+      />
+    );
+  };
+
+  renderEditableSelect = cellInfo => {
+    const cellValue = this.state.data[cellInfo.index][cellInfo.column.id];
+    var accts = ConvertToSelect.convertAccountsHtml(this.state.accounts);
+      //var accts0 = [ { label : '05404649541', value : '05404649541' } ];
+      //var accts = [ { id : '05404649541', name : '05404649541 65000' } ];
+      var data = accts;
+      let options = accts.map((data) =>
+                <option 
+                    key={data.id}
+                    value={data.id}
+                >
+                    {data.name}
+                </option>
+            );
+      console.log(accts);
+      console.log(options);
+      return (
+	  <select name="customSearch" className="custom-search-select" onChange={this.handleInputChange.bind(null, cellInfo)}>
+                <option>Select Item</option>
+                {options}
+           </select>
+    );
+  };
+
+  renderEditableDate = cellInfo => {
+    const cellValue = this.state.data[cellInfo.index][cellInfo.column.id];
+
+    return (
+	<DatePicker
+	  dateFormat="yyyy-MM-dd"
+        onChange={this.handleInputChangeDate.bind(null, cellInfo)}
+      />
+    );
+  };
+
+  addNewQnaToTable() {
+      let newQnA = {
+	  account: "",
+	  date: "",
+	  creditor: "",
+	  amount: "",
+	  message: "",
+      };
+      const insert = (arr, index, newItem) => [ ...arr.slice(0, index), newItem, ...arr.slice(index) ];
+      console.log(newQnA);
+      console.log(this.state.data.length);
+      this.setState(oldstate => ({ data: insert(oldstate.data, 0, newQnA) }));
+  }
+
+    handleInputChange = (cellInfo, event) => {
+	console.log(cellInfo)
+	console.log(event)
+    let data = [...this.state.data];
+    data[cellInfo.index][cellInfo.column.id] = event.target.value;
+
+    this.setState({ data });
+  };
+
+    handleInputChangeDate = (cellInfo, event) => {
+	console.log(cellInfo)
+	console.log(event)
+    let data = [...this.state.data];
+	data[cellInfo.index][cellInfo.column.id] = event;
+	    //.target.value;
+
+    this.setState({ data });
+  };
+}
+    
 export default DNBBar;
 

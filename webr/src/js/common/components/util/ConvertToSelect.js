@@ -32,5 +32,23 @@ function convertAccounts(array) {
   return myArray;
 }
 
-const ConvertToSelect = { convert, convertAccounts };
+function convertAccountsHtml(array) {
+  array = array.accounts;
+  console.log(array);
+  console.log(typeof array);
+  var myArray = [];
+  for(var i in array) {
+    var acc = array[i];
+    var item = {
+      id: acc.bban,
+      name: acc.bban + " " + acc.name + " Disponibelt: " + acc.authorisedBalance,
+    }
+    myArray.push(item);
+  }
+  console.log(typeof myArray);
+  console.log(myArray);
+  return myArray;
+}
+
+const ConvertToSelect = { convert, convertAccounts, convertAccountsHtml };
 export default ConvertToSelect;
