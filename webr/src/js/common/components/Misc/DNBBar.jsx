@@ -513,17 +513,6 @@ class DNBBar extends PureComponent {
                 accessor: "creditor",
                 Cell: this.renderEditable
             });
-	    columns.push({
-                Header: "Full Name",
-                id: "full",
-                accessor: d => (
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: d.amount + " " + d.message
-                    }}
-                  />
-                )
-            });
 	return columns;
     }
     
@@ -699,6 +688,7 @@ class DNBBar extends PureComponent {
 		  columns={columns}
 		  defaultPageSize={10}
 		  className="-striped -highlight"
+		  showPagination="false"
 		  />
                     <Nav>
                       <NavItem eventKey={3} href="#">

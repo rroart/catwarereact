@@ -46,12 +46,6 @@ class Main extends React.Component {
 		    <Tab eventKey={0} title="DNB">
 		      <DNB/>
 		    </Tab>
-		    <Tab eventKey={1} title="Payex">
-		      <Misc/>
-		    </Tab>
-		    <Tab eventKey={2} title="Vipps">
-		      <Vipps/>
-		    </Tab>
 		    { mytabs.map(item => this.getanewtab(item)) }
 		  </Tabs>
 		</Fragment>
