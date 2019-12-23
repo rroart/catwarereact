@@ -10,4 +10,4 @@ RUN npm install
 RUN npm run build
 WORKDIR /app/webr/docroot
 
-CMD http-server -p 3083
+CMD http-server -p 80
