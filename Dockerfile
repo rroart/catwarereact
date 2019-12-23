@@ -4,7 +4,7 @@ ENV NPM_CONFIG_LOGLEVEL warn
 RUN mkdir /app
 WORKDIR /app
 COPY . .
-RUN cd webr
+WORKDIR /app/webr
 RUN npm install -g http-server
 RUN npm install
 RUN npm run build
