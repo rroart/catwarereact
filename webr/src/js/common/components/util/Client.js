@@ -5,8 +5,15 @@ function getPort() {
     return 8080;
 }
 
+function getHost() {
+    if (process.env.NODE_ENV == "production") {
+	return "www.catwarebank.tk";
+    }
+    return "localhost";
+}
+
 function search(query, cb) {
-  return fetch(`http://localhost:` + getPort() + query, {
+    return fetch(`http://` + getHost() + `:` + getPort() + query, {
     accept: 'application/json',
     headers: {
 	  'content-type': 'application/json',
@@ -19,7 +26,7 @@ function search(query, cb) {
 
 function post(query, data, cb) {
     console.log(JSON.stringify(data))
-  return fetch(`http://localhost:` + getPort() + query, {
+    return fetch(`http://` + getHost() + `:` + getPort() + query, {
     accept: 'application/json',
     headers: {
 	  'content-type': 'application/json',
