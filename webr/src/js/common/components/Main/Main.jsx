@@ -25,6 +25,7 @@ class Main extends React.Component {
     }
 
     render() {
+      console.log(this)
 	const { main } = this.props;
 	const result = main && main.result2 ? main.result2 : null;
 	const tabs = main && main.tabs ? main.tabs : null;
@@ -44,7 +45,7 @@ class Main extends React.Component {
 		  <h1>Catware React</h1>
 		  <Tabs defaultActiveKey={0} id="maintabs">
 		    <Tab eventKey={0} title="DNB">
-		      <DNB/>
+		      <DNB history={main.history}/>
 		    </Tab>
 		    { mytabs.map(item => this.getanewtab(item)) }
 		  </Tabs>

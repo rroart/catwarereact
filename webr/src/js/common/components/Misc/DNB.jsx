@@ -11,9 +11,10 @@ class DNB extends PureComponent {
     }
 
     render() {
+      console.log(this)
 	return (
 	    <div>
-	      <DNBBar type='dnb'/>
+	      <DNBBar type='dnb' history={history}/>
 	    </div>
 	);
     }

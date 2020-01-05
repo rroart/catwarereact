@@ -19,7 +19,7 @@ import 'react-table/react-table.css';
 import {MyTable} from '../Table'
 
 import DatePicker from "react-datepicker";
- 
+
 import "react-datepicker/dist/react-datepicker.css";
 
 const bank = "DNB";
@@ -308,6 +308,8 @@ class DNBBar extends PureComponent {
         page: 99,
       });
     }
+    //console.log("window reset")
+    //window.location.search = 'psu='+mythis.state.psuid;
   }
 
   async handletransactionresult(mythis, result, statuscode) {
@@ -515,9 +517,11 @@ class DNBBar extends PureComponent {
             });
 	return columns;
     }
-    
+
   render() {
     console.log("xxx")
+    console.log(this.state.psuid)
+    console.log(this)
     console.log(this.state.page)
     console.log(this.state.subpage)
     console.log(this.state.subsubpage)
@@ -525,6 +529,39 @@ class DNBBar extends PureComponent {
     console.log(this.state)
     console.log(this.state.psuid == undefined)
       console.log(this.state.data)
+    var urlParams = new URLSearchParams(window.location.search);
+    var psu = urlParams.get('psu');
+    var go = urlParams.get('go');
+    console.log(psu);
+    console.log(go);
+    if (psu != undefined) {
+      console.log(this.state.psuid);
+      this.state.psuid = psu;
+      console.log(window.location.pathname);
+      console.log(window.location.href);
+      this.props.history.pushState({ myid : "here"}, "", window.location.pathname)
+      if (go == undefined) {
+
+      }
+      if (go == 1) {
+        this.state.logon = undefined;
+        this.readAccounts();
+      }
+      if (go == 2) {
+        this.state.page = 5;
+        this.state.subpage = 1;
+        this.state.subsubpage = 3;
+      }
+      if (go == 3) {
+        this.state.page = 5;
+        this.state.subpage = 2;
+        this.state.subsubpage = 3;
+      }
+       //this.props.history.push(`${window.location.pathname}`)
+      console.log("reset window.location.search");
+      //window.location.search = 'psu='+psu;
+      console.log("reset window.location.search");
+    }
     if (this.state.psuid != undefined) {
       console.log(this.state.psuid)
     }
@@ -577,7 +614,7 @@ class DNBBar extends PureComponent {
     }
     if (this.state.page == 2) {
       //window.location.href = this.state.logon;
-      var win = window.open(this.state.logon, '_blank');
+      var win = window.open(this.state.logon,"_self");
       console.log(this.state.logon)
       console.log(win)
       if (win != null) {
@@ -585,11 +622,11 @@ class DNBBar extends PureComponent {
       }
       console.log(new Date().getSeconds())
       // calling bad code
-      this.sleep(15000);
+      //this.sleep(15000);
       console.log(new Date().getSeconds())
       console.log("undef");
-      this.state.logon = undefined;
-      this.readAccounts();
+      //this.state.logon = undefined;
+      //this.readAccounts();
       console.log(this.state);
     }
     if (this.state.page == 3) {
@@ -706,14 +743,16 @@ class DNBBar extends PureComponent {
           )
         }
         if (this.state.subsubpage == 2) {
-          var win = window.open(this.state.logon, '_blank');
+          var win = window.open(this.state.logon,"_self");
           win.focus();
           console.log(new Date().getSeconds())
           // calling bad code
-          this.sleep(15000);
+          //this.sleep(15000);
           console.log(new Date().getSeconds())
           console.log("undef");
-          this.state.logon = undefined;
+          //this.state.logon = undefined;
+        }
+        if (this.state.subsubpage == 3) {
           comp = (
             <Navbar>
               <Navbar.Header>
@@ -737,7 +776,7 @@ class DNBBar extends PureComponent {
 	    const data = this.state.data;
 	    console.log(data);
 	    const columns = this.getColumns();
-	    
+
           comp = (
             <Navbar>
               <Navbar.Header>
@@ -775,13 +814,15 @@ class DNBBar extends PureComponent {
           )
         }
         if (this.state.subsubpage == 2) {
-            var win = window.open(this.state.logon, '_blank');
-	    if (win != null) {
-		win.focus();
-	    }
+          var win = window.open(this.state.logon,"_self");
+          if (win != null) {
+            win.focus();
+          }
+        }
+        if (this.state.subsubpage == 3) {
           console.log(new Date().getSeconds())
           // calling bad code
-          this.sleep(15000);
+          // this.sleep(15000);
           console.log(new Date().getSeconds())
           console.log("undef");
           this.state.logon = undefined;
@@ -856,7 +897,7 @@ class DNBBar extends PureComponent {
       //var accts = [ { id : '05404649541', name : '05404649541 65000' } ];
       var data = accts;
       let options = accts.map((data) =>
-                <option 
+                <option
                     key={data.id}
                     value={data.id}
                 >
@@ -917,6 +958,6 @@ class DNBBar extends PureComponent {
     this.setState({ data });
   };
 }
-    
+
 export default DNBBar;
 
