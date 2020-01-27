@@ -7,7 +7,7 @@ function getPort() {
 
 function getHost() {
     if (process.env.NODE_ENV == "production") {
-	return "core.catwarebank.tk";
+	return process.env.CATWARECORESERVER;
     }
     return "localhost";
 }
