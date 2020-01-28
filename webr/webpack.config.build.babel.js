@@ -137,7 +137,7 @@ webpackConfig.plugins.push(
     __CONFIG__: JSON.stringify(config.get('app')),
     'process.env': {
       NODE_ENV: JSON.stringify('production'),
-      CORECATWARESERVER: process.env.CORECATWARESERVER
+      CORECATWARESERVER: JSON.stringify(process.env.CORECATWARESERVER)
     },
   }),
   new webpack.LoaderOptionsPlugin({
