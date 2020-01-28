@@ -1,7 +1,7 @@
 FROM node:12
 MAINTAINER <rroart@gmail.com>
 ARG catwarecoreserver
-ENV CATWARECORESERVER = ${catwarecoreserver}
+ENV CORECATWARESERVER = ${catwarecoreserver}
 ENV NPM_CONFIG_LOGLEVEL warn
 RUN mkdir /app
 WORKDIR /app
@@ -12,4 +12,4 @@ RUN npm install
 RUN npm run build
 WORKDIR /app/webr/docroot
 
-CMD CATWARECORESERVER=${CATWARECORESERVER} http-server -p 80
+CMD CORECATWARESERVER=${CORECATWARESERVER} http-server -p 80
