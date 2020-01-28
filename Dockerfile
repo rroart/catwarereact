@@ -2,6 +2,7 @@ FROM node:12
 MAINTAINER <rroart@gmail.com>
 ARG catwarecoreserver
 ENV NPM_CONFIG_LOGLEVEL warn
+ENV CORECATWARESERVER = ${catwarecoreserver}
 RUN mkdir /app
 WORKDIR /app
 COPY . .
