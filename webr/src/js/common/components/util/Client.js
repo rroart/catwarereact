@@ -6,6 +6,8 @@ function getPort() {
 }
 
 function getHost() {
+  console.log("pppp");
+  console.log(process.env);
     if (process.env.NODE_ENV == "production") {
 	return process.env.CORECATWARESERVER;
     }
