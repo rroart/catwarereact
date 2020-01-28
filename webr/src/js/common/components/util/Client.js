@@ -7,7 +7,7 @@ function getPort() {
 
 function getHost() {
     if (process.env.NODE_ENV == "production") {
-	return process.env.CATWARECORESERVER;
+	return process.env.CORECATWARESERVER;
     }
     return "localhost";
 }
