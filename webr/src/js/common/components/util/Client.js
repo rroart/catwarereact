@@ -2,6 +2,9 @@
 
 function getPort() {
     //return 1337;
+    if (process.env.NODE_ENV == "production") {
+	return 80;
+    }
     return 8080;
 }
 
