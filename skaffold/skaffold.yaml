@@ -1,0 +1,20 @@
+apiVersion: skaffold/v2alpha4
+kind: Config
+metadata:
+  name: bankweb
+build:
+  artifacts:
+  - image: bankweb
+    context: ..
+    docker:
+      buildArgs:
+        catwarecoreserver: '{{.BANKCATWARECORESERVER}}'
+deploy:
+  kubectl:
+    manifests:
+    - k8s-pod.yaml
+portForward:
+  - resourceType: deployment
+    resourceName: bankweb
+    port: 80
+    localPort: 80
